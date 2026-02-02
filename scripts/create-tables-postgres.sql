@@ -8,6 +8,8 @@ BEGIN;
 
 DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS customer_product_preferences;
+DROP TABLE IF EXISTS customer_category_preferences;
 DROP TABLE IF EXISTS auth_tokens;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS addresses;
@@ -99,5 +101,31 @@ CREATE TABLE auth_tokens (
 
 CREATE INDEX idx_auth_tokens_client_id ON auth_tokens(client_id);
 CREATE INDEX idx_auth_tokens_expires_at ON auth_tokens(expires_at);
+
+CREATE TABLE customer_product_preferences (
+    id BIGSERIAL PRIMARY KEY,
+    customer_id BIGINT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    product_id BIGINT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    preference_score INTEGER CHECK (preference_score IS NULL OR (preference_score >= 1 AND preference_score <= 10)),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE (customer_id, product_id)
+);
+
+CREATE INDEX idx_customer_product_preferences_customer ON customer_product_preferences(customer_id);
+CREATE INDEX idx_customer_product_preferences_product ON customer_product_preferences(product_id);
+
+CREATE TABLE customer_category_preferences (
+    id BIGSERIAL PRIMARY KEY,
+    customer_id BIGINT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    category_id BIGINT NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+    preference_score INTEGER CHECK (preference_score IS NULL OR (preference_score >= 1 AND preference_score <= 10)),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE (customer_id, category_id)
+);
+
+CREATE INDEX idx_customer_category_preferences_customer ON customer_category_preferences(customer_id);
+CREATE INDEX idx_customer_category_preferences_category ON customer_category_preferences(category_id);
 
 COMMIT;

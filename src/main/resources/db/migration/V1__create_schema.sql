@@ -104,3 +104,34 @@ CREATE INDEX IF NOT EXISTS idx_auth_tokens_client_id ON auth_tokens(client_id);
 CREATE INDEX IF NOT EXISTS idx_auth_tokens_expires_at ON auth_tokens(expires_at);
 
 COMMENT ON TABLE auth_tokens IS 'JWT auth tokens for client authentication';
+
+-- Customer Product Preferences
+CREATE TABLE IF NOT EXISTS customer_product_preferences (
+    id BIGSERIAL PRIMARY KEY,
+    customer_id BIGINT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    product_id BIGINT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    preference_score INTEGER CHECK (preference_score IS NULL OR (preference_score >= 1 AND preference_score <= 10)),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE (customer_id, product_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_customer_product_preferences_customer ON customer_product_preferences(customer_id);
+CREATE INDEX IF NOT EXISTS idx_customer_product_preferences_product ON customer_product_preferences(product_id);
+
+-- Customer Category Preferences
+CREATE TABLE IF NOT EXISTS customer_category_preferences (
+    id BIGSERIAL PRIMARY KEY,
+    customer_id BIGINT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    category_id BIGINT NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+    preference_score INTEGER CHECK (preference_score IS NULL OR (preference_score >= 1 AND preference_score <= 10)),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE (customer_id, category_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_customer_category_preferences_customer ON customer_category_preferences(customer_id);
+CREATE INDEX IF NOT EXISTS idx_customer_category_preferences_category ON customer_category_preferences(category_id);
+
+COMMENT ON TABLE customer_product_preferences IS 'Customer favorite products with optional preference score 1-10';
+COMMENT ON TABLE customer_category_preferences IS 'Customer preferred categories with optional preference score 1-10';
