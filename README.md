@@ -93,4 +93,3 @@ mvn test
 | Orders     | `/api/v1/orders`     | Create, list, get, update status, delete |
 | Addresses  | `/api/v1/addresses`  | CRUD, list by customer        |
 
-All code and comments are in **English**.
